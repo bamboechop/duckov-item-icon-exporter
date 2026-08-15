@@ -1,0 +1,36 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DuckovItemIconExporter.Core", "src\DuckovItemIconExporter.Core\DuckovItemIconExporter.Core.csproj", "{243947E1-7B57-4A3C-9F10-0A0201245071}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DuckovItemIconExporter", "src\DuckovItemIconExporter\DuckovItemIconExporter.csproj", "{EFCE9336-B833-4B47-B61C-E3E1B4700CA8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DuckovItemIconExporter.Tests", "tests\DuckovItemIconExporter.Tests\DuckovItemIconExporter.Tests.csproj", "{C58A5E39-3646-417A-B77F-718332A18522}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DuckovItemIconExporter.ContractProbe", "tools\DuckovItemIconExporter.ContractProbe\DuckovItemIconExporter.ContractProbe.csproj", "{2F876D18-2B6F-410E-97C2-A44E487B8A46}"
+EndProject
+Global
+  GlobalSection(SolutionConfigurationPlatforms) = preSolution
+    Debug|Any CPU = Debug|Any CPU
+    Release|Any CPU = Release|Any CPU
+  EndGlobalSection
+  GlobalSection(ProjectConfigurationPlatforms) = postSolution
+    {243947E1-7B57-4A3C-9F10-0A0201245071}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {243947E1-7B57-4A3C-9F10-0A0201245071}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {243947E1-7B57-4A3C-9F10-0A0201245071}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {243947E1-7B57-4A3C-9F10-0A0201245071}.Release|Any CPU.Build.0 = Release|Any CPU
+    {EFCE9336-B833-4B47-B61C-E3E1B4700CA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {EFCE9336-B833-4B47-B61C-E3E1B4700CA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {EFCE9336-B833-4B47-B61C-E3E1B4700CA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {EFCE9336-B833-4B47-B61C-E3E1B4700CA8}.Release|Any CPU.Build.0 = Release|Any CPU
+    {C58A5E39-3646-417A-B77F-718332A18522}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {C58A5E39-3646-417A-B77F-718332A18522}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {C58A5E39-3646-417A-B77F-718332A18522}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {C58A5E39-3646-417A-B77F-718332A18522}.Release|Any CPU.Build.0 = Release|Any CPU
+    {2F876D18-2B6F-410E-97C2-A44E487B8A46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {2F876D18-2B6F-410E-97C2-A44E487B8A46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {2F876D18-2B6F-410E-97C2-A44E487B8A46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {2F876D18-2B6F-410E-97C2-A44E487B8A46}.Release|Any CPU.Build.0 = Release|Any CPU
+  EndGlobalSection
+EndGlobal

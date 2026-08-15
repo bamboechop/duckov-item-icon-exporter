@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>DuckovItemIconExporter</AssemblyName>
+    <RootNamespace>DuckovItemIconExporter</RootNamespace>
+    <DuckovPath Condition="'$(DuckovPath)' == ''">$(DUCKOV_PATH)</DuckovPath>
+    <DuckovManagedPath>$(DuckovPath)\Duckov_Data\Managed</DuckovManagedPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DuckovItemIconExporter.Core\DuckovItemIconExporter.Core.csproj" />
+    <Reference Include="ItemStatsSystem" HintPath="$(DuckovManagedPath)\ItemStatsSystem.dll" Private="false" />
+    <Reference Include="TeamSoda.Duckov.Core" HintPath="$(DuckovManagedPath)\TeamSoda.Duckov.Core.dll" Private="false" />
+    <Reference Include="TeamSoda.Duckov.Utilities" HintPath="$(DuckovManagedPath)\TeamSoda.Duckov.Utilities.dll" Private="false" />
+    <Reference Include="UnityEngine.CoreModule" HintPath="$(DuckovManagedPath)\UnityEngine.CoreModule.dll" Private="false" />
+    <Reference Include="UnityEngine.ImageConversionModule" HintPath="$(DuckovManagedPath)\UnityEngine.ImageConversionModule.dll" Private="false" />
+  </ItemGroup>
+  <Target Name="RequireDuckovPath" BeforeTargets="ResolveReferences" Condition="'$(DuckovPath)' == ''">
+    <Error Text="Set DuckovPath or DUCKOV_PATH to the Escape from Duckov installation." />
+  </Target>
+</Project>

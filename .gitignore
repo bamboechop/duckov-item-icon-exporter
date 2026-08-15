@@ -1,0 +1,15 @@
+# Build and test outputs
+[Bb]in/
+[Oo]bj/
+[Tt]est[Rr]esults/
+
+# Local game-path configuration and deployment staging
+.env
+artifacts/
+deploy/
+
+# Exported game assets must never be committed.
+exports/
+/DuckovItemIconExporter/
+*.png
+!preview.png
