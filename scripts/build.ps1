@@ -28,6 +28,7 @@ New-Item -ItemType Directory -Path $packageRoot -Force | Out-Null
 Copy-Item -LiteralPath (Join-Path $repoRoot 'src\DuckovItemIconExporter\bin\Release\netstandard2.1\DuckovItemIconExporter.dll') -Destination (Join-Path $packageRoot 'DuckovItemIconExporter.dll')
 Copy-Item -LiteralPath (Join-Path $repoRoot 'src\DuckovItemIconExporter\bin\Release\netstandard2.1\DuckovItemIconExporter.Core.dll') -Destination (Join-Path $packageRoot 'DuckovItemIconExporter.Core.dll')
 Copy-Item -LiteralPath (Join-Path $repoRoot 'src\DuckovItemIconExporter\info.ini') -Destination (Join-Path $packageRoot 'info.ini')
+Copy-Item -LiteralPath (Join-Path $repoRoot 'src\DuckovItemIconExporter\preview.png') -Destination (Join-Path $packageRoot 'preview.png')
 & (Join-Path $PSScriptRoot 'verify-package.ps1') -PackageDirectory $packageRoot
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 

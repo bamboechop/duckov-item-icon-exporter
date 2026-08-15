@@ -19,10 +19,14 @@ Get-ChildItem -LiteralPath $package -File | Select-Object Name, Length
 Write-Host "Only deployment target: $target"
 if (Test-Path -LiteralPath $target) {
     $currentFiles = @(Get-ChildItem -LiteralPath $target -File | Select-Object -ExpandProperty Name | Sort-Object)
-    $expectedFiles = @('DuckovItemIconExporter.Core.dll', 'DuckovItemIconExporter.dll', 'info.ini')
-    if (($currentFiles -join '|') -ne ($expectedFiles -join '|')) { throw "Existing target has an unexpected inventory; refusing to alter it: $($currentFiles -join ', ')" }
+    $expectedFiles = @('DuckovItemIconExporter.Core.dll', 'DuckovItemIconExporter.dll', 'info.ini', 'preview.png')
+    $legacyFiles = @('DuckovItemIconExporter.Core.dll', 'DuckovItemIconExporter.dll', 'info.ini')
+    $isCurrentInventory = ($currentFiles -join '|') -eq ($expectedFiles -join '|')
+    $isLegacyInventory = ($currentFiles -join '|') -eq ($legacyFiles -join '|')
+    if (-not ($isCurrentInventory -or $isLegacyInventory)) { throw "Existing target has an unexpected inventory; refusing to alter it: $($currentFiles -join ', ')" }
     if (-not $ReplaceExisting) { throw "Deployment target already exists: $target. Do not replace or back it up without explicit approval." }
-    Write-Host 'Existing target contains only the exporter files and will be overwritten in place; no backup or deletion will occur.'
+    if ($isLegacyInventory) { Write-Host 'Existing target has the known pre-preview exporter inventory; preview.png will be added in place.' }
+    else { Write-Host 'Existing target contains only the current exporter files and will be overwritten in place; no backup or deletion will occur.' }
 }
 else { Write-Host 'Target does not exist. No files were written.' }
 if (-not $Deploy) { return }

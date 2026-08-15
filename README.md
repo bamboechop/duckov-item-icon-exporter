@@ -1,8 +1,12 @@
 # Duckov Item Icon Exporter
 
+![Duckov Item Icon Exporter preview](src/DuckovItemIconExporter/preview.png)
+
 Duckov Item Icon Exporter is a standalone, one-time developer utility mod. When enabled, it exports the base game's inventory sprites as transparent PNGs for local Photoshop and UI-design reference. It does not write saves, alter inventory or progression, change game assets, or change game configuration.
 
 The source tree and package intentionally contain no Duckov, Unity, or other game DLLs. Do not redistribute extracted icons: they remain game assets and are for local design reference only.
+
+`preview.psd` is the editable source for the shipped `src/DuckovItemIconExporter/preview.png`; only the PNG is placed in the mod package.
 
 ## Repository status
 
@@ -37,6 +41,7 @@ artifacts/package/DuckovItemIconExporter/
   DuckovItemIconExporter.dll
   DuckovItemIconExporter.Core.dll
   info.ini
+  preview.png
 ```
 
 ## Deployment
@@ -53,11 +58,11 @@ It shows the exact three deployment files and checks only this target:
 E:\SteamLibrary\steamapps\common\Escape from Duckov\Duckov_Data\Mods\DuckovItemIconExporter
 ```
 
-It does not write anything without `-Deploy`. If that exact directory exists, the script refuses to overwrite or back it up; inspect it and obtain explicit approval before any replacement. After approval, use `-Deploy -ReplaceExisting`; it verifies that the existing directory contains only the three exporter files and overwrites those files in place without a backup or deletion. Removal is simply deleting that exact exporter directory after the game is closed; no save or game asset repair is needed.
+It does not write anything without `-Deploy`. If that exact directory exists, the script refuses to overwrite or back it up; inspect it and obtain explicit approval before any replacement. After approval, use `-Deploy -ReplaceExisting`; it verifies that the existing directory contains only the four exporter files (or the known pre-preview three-file layout) and overwrites or adds only exporter files in place without a backup or deletion. Removal is simply deleting that exact exporter directory after the game is closed; no save or game asset repair is needed.
 
 ## Use and output
 
-The user launches Duckov and enables the mod through Duckov's normal mod UI if needed. Once its native collection is ready, the exporter shows a full-screen progress overlay; its topmost UI blocker prevents normal menu clicks while it runs. On success, it switches to a completion screen showing the absolute export path. **Copy export path** puts that path on the clipboard, and **Close** dismisses the screen. The completion screen explicitly confirms that the exporter has already disabled itself, so it will not export again on a later game start. It logs with `[DuckovItemIconExporter]`, runs one export only, and logs the absolute directory and discovered/successful/unavailable/failed totals. If the item collection is unavailable or manifest generation fails, it remains enabled and logs the reason rather than silently disabling itself.
+The user launches Duckov and enables the mod through Duckov's normal mod UI if needed. Its root-level `preview.png` is used by Duckov's mod menu and Steam Workshop upload. Once its native collection is ready, the exporter shows a full-screen progress overlay; its topmost UI blocker prevents normal menu clicks while it runs. On success, it switches to a completion screen showing the absolute export path. **Copy export path** puts that path on the clipboard, and **Close** dismisses the screen. The completion screen explicitly confirms that the exporter has already disabled itself, so it will not export again on a later game start. It logs with `[DuckovItemIconExporter]`, runs one export only, and logs the absolute directory and discovered/successful/unavailable/failed totals. If the item collection is unavailable or manifest generation fails, it remains enabled and logs the reason rather than silently disabling itself.
 
 Exports are never written to this repository. Each set is isolated under:
 
