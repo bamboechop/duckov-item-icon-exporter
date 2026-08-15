@@ -13,13 +13,17 @@ var managed = Path.GetFullPath(args[0]);
 var itemStatsPath = Path.Combine(managed, "ItemStatsSystem.dll");
 var corePath = Path.Combine(managed, "TeamSoda.Duckov.Core.dll");
 var unityCorePath = Path.Combine(managed, "UnityEngine.CoreModule.dll");
+var unityUiPath = Path.Combine(managed, "UnityEngine.UI.dll");
+var unityUiModulePath = Path.Combine(managed, "UnityEngine.UIModule.dll");
 var failures = new List<string>();
-RequireFile(itemStatsPath); RequireFile(corePath); RequireFile(unityCorePath);
+RequireFile(itemStatsPath); RequireFile(corePath); RequireFile(unityCorePath); RequireFile(unityUiPath); RequireFile(unityUiModulePath);
 if (failures.Count == 0)
 {
     using var items = new MetadataAssembly(itemStatsPath);
     using var core = new MetadataAssembly(corePath);
     using var unity = new MetadataAssembly(unityCorePath);
+    using var unityUi = new MetadataAssembly(unityUiPath);
+    using var unityUiModule = new MetadataAssembly(unityUiModulePath);
     Require(items.HasType("ItemStatsSystem", "ItemMetaData"), "ItemStatsSystem.ItemMetaData type is missing.");
     Require(items.FieldHasType("ItemStatsSystem", "ItemMetaData", "icon", "UnityEngine.Sprite"), "ItemMetaData.icon is not UnityEngine.Sprite.");
     Require(items.FieldExists("ItemStatsSystem", "ItemMetaData", "id"), "ItemMetaData.id is missing.");
@@ -42,6 +46,10 @@ if (failures.Count == 0)
     Require(core.MethodCalls("Duckov.UI", "ItemDisplay", "Setup", "ItemStatsSystem.Item", "get_Icon") && core.MethodCalls("Duckov.UI", "ItemDisplay", "Setup", "UnityEngine.UI.Image", "set_sprite"), "ItemDisplay.Setup no longer assigns Item.Icon to Image.sprite.");
     Require(unity.HasType("UnityEngine", "Sprite"), "UnityEngine.Sprite type is missing.");
     Require(unity.HasType("UnityEngine", "RenderTexture"), "UnityEngine.RenderTexture type is missing.");
+    Require(unityUi.HasType("UnityEngine.UI", "Image"), "UnityEngine.UI.Image type is missing.");
+    Require(unityUi.HasType("UnityEngine.UI", "GraphicRaycaster"), "UnityEngine.UI.GraphicRaycaster type is missing.");
+    Require(unityUiModule.HasType("UnityEngine", "Canvas"), "UnityEngine.Canvas type is missing.");
+    Require(unityUiModule.HasType("UnityEngine", "CanvasRenderer"), "UnityEngine.CanvasRenderer type is missing.");
 }
 
 if (failures.Count > 0)

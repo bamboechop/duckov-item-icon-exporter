@@ -13,6 +13,8 @@
     <Reference Include="TeamSoda.Duckov.Utilities" HintPath="$(DuckovManagedPath)\TeamSoda.Duckov.Utilities.dll" Private="false" />
     <Reference Include="UnityEngine.CoreModule" HintPath="$(DuckovManagedPath)\UnityEngine.CoreModule.dll" Private="false" />
     <Reference Include="UnityEngine.ImageConversionModule" HintPath="$(DuckovManagedPath)\UnityEngine.ImageConversionModule.dll" Private="false" />
+    <Reference Include="UnityEngine.UI" HintPath="$(DuckovManagedPath)\UnityEngine.UI.dll" Private="false" />
+    <Reference Include="UnityEngine.UIModule" HintPath="$(DuckovManagedPath)\UnityEngine.UIModule.dll" Private="false" />
   </ItemGroup>
   <Target Name="RequireDuckovPath" BeforeTargets="ResolveReferences" Condition="'$(DuckovPath)' == ''">
     <Error Text="Set DuckovPath or DUCKOV_PATH to the Escape from Duckov installation." />

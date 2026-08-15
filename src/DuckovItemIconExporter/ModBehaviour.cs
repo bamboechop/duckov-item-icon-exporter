@@ -7,6 +7,7 @@ using Duckov.Modding;
 using Duckov.Utilities;
 using ItemStatsSystem;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace DuckovItemIconExporter
 {
@@ -18,6 +19,7 @@ namespace DuckovItemIconExporter
         private Coroutine? exportRoutine;
         private bool exportStarted;
         private SpriteRenderSurface? renderSurface;
+        private ExportProgressOverlay? progressOverlay;
 
         protected override void OnAfterSetup()
         {
@@ -31,6 +33,8 @@ namespace DuckovItemIconExporter
             exportRoutine = null;
             renderSurface?.Dispose();
             renderSurface = null;
+            progressOverlay?.Dispose();
+            progressOverlay = null;
             Debug.Log(Prefix + " shut down cleanly.");
         }
 
@@ -75,9 +79,11 @@ namespace DuckovItemIconExporter
             var results = new List<ExportItem>(entries.Count);
             var fileNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             renderSurface = new SpriteRenderSurface();
+            progressOverlay = new ExportProgressOverlay(entries.Count);
             for (var index = 0; index < entries.Count; index++)
             {
                 results.Add(ExportEntry(entries[index], duplicateIds.Contains(entries[index].typeID), iconDirectory, fileNames));
+                progressOverlay.SetProgress(index + 1);
                 if ((index + 1) % IconsPerFrame == 0) yield return null;
             }
 
@@ -100,6 +106,11 @@ namespace DuckovItemIconExporter
             {
                 renderSurface?.Dispose();
                 renderSurface = null;
+                if (!exportCompleted)
+                {
+                    progressOverlay?.Dispose();
+                    progressOverlay = null;
+                }
             }
 
             if (exportCompleted)
@@ -213,6 +224,82 @@ namespace DuckovItemIconExporter
             {
                 // A failed best-effort cleanup must not hide the collection-unavailable error.
             }
+        }
+    }
+
+    /// <summary>Blocks the game's regular UI while the one-time export is in progress.</summary>
+    internal sealed class ExportProgressOverlay : IDisposable
+    {
+        private readonly GameObject root;
+        private readonly RectTransform fill;
+        private readonly int total;
+
+        public ExportProgressOverlay(int total)
+        {
+            if (total <= 0) throw new ArgumentOutOfRangeException(nameof(total));
+            this.total = total;
+
+            root = new GameObject("DuckovItemIconExporter.ProgressOverlay", typeof(RectTransform), typeof(Canvas), typeof(GraphicRaycaster))
+            {
+                hideFlags = HideFlags.HideAndDontSave
+            };
+            var canvas = root.GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.overrideSorting = true;
+            canvas.sortingOrder = short.MaxValue;
+
+            var blocker = CreateImage("Blocker", root.transform, new Color(0f, 0f, 0f, 0.82f), true);
+            Stretch(blocker.rectTransform);
+
+            var panel = CreateImage("Panel", root.transform, new Color(0.08f, 0.12f, 0.16f, 0.96f), false);
+            panel.rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+            panel.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+            panel.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            panel.rectTransform.sizeDelta = new Vector2(560f, 104f);
+
+            var track = CreateImage("Track", panel.transform, new Color(1f, 1f, 1f, 0.16f), false);
+            track.rectTransform.anchorMin = new Vector2(0f, 0.36f);
+            track.rectTransform.anchorMax = new Vector2(1f, 0.64f);
+            track.rectTransform.offsetMin = new Vector2(32f, 0f);
+            track.rectTransform.offsetMax = new Vector2(-32f, 0f);
+
+            var fillImage = CreateImage("Fill", track.transform, new Color(0.12f, 0.88f, 0.94f, 1f), false);
+            fill = fillImage.rectTransform;
+            fill.anchorMin = Vector2.zero;
+            fill.anchorMax = new Vector2(0f, 1f);
+            fill.offsetMin = Vector2.zero;
+            fill.offsetMax = Vector2.zero;
+        }
+
+        public void SetProgress(int completed)
+        {
+            fill.anchorMax = new Vector2(Mathf.Clamp01(completed / (float)total), 1f);
+        }
+
+        public void Dispose()
+        {
+            if (root != null) UnityEngine.Object.Destroy(root);
+        }
+
+        private static Image CreateImage(string name, Transform parent, Color color, bool raycastTarget)
+        {
+            var imageObject = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image))
+            {
+                hideFlags = HideFlags.HideAndDontSave
+            };
+            imageObject.transform.SetParent(parent, false);
+            var image = imageObject.GetComponent<Image>();
+            image.color = color;
+            image.raycastTarget = raycastTarget;
+            return image;
+        }
+
+        private static void Stretch(RectTransform rect)
+        {
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
         }
     }
 
