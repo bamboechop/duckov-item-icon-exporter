@@ -196,6 +196,9 @@ namespace DuckovItemIconExporter
             cameraObject.transform.position = new Vector3(0f, 0f, -10f);
             camera = cameraObject.AddComponent<Camera>();
             camera.orthographic = true;
+            // Render() is invoked explicitly into a temporary RenderTexture. Keeping this camera
+            // disabled prevents it from becoming a normal game camera and clearing the menu view.
+            camera.enabled = false;
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor = new Color(0f, 0f, 0f, 0f);
             camera.cullingMask = 1 << RenderLayer;

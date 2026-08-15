@@ -47,7 +47,7 @@ It shows the exact three deployment files and checks only this target:
 E:\SteamLibrary\steamapps\common\Escape from Duckov\Duckov_Data\Mods\DuckovItemIconExporter
 ```
 
-It does not write anything without `-Deploy`. If that exact directory exists, the script refuses to overwrite or back it up; inspect it and obtain explicit approval before any replacement. After approval, use `-Deploy` only when the target is absent. Removal is simply deleting that exact exporter directory after the game is closed; no save or game asset repair is needed.
+It does not write anything without `-Deploy`. If that exact directory exists, the script refuses to overwrite or back it up; inspect it and obtain explicit approval before any replacement. After approval, use `-Deploy -ReplaceExisting`; it verifies that the existing directory contains only the three exporter files and overwrites those files in place without a backup or deletion. Removal is simply deleting that exact exporter directory after the game is closed; no save or game asset repair is needed.
 
 ## Use and output
 
