@@ -57,7 +57,7 @@ It does not write anything without `-Deploy`. If that exact directory exists, th
 
 ## Use and output
 
-The user launches Duckov and enables the mod through Duckov's normal mod UI if needed. It logs with `[DuckovItemIconExporter]`, waits for the native collection, runs one export only, and logs the absolute directory and discovered/successful/unavailable/failed totals. It neither repeats across scene/raid/save transitions nor has a re-export hotkey.
+The user launches Duckov and enables the mod through Duckov's normal mod UI if needed. It logs with `[DuckovItemIconExporter]`, waits for the native collection, runs one export only, and logs the absolute directory and discovered/successful/unavailable/failed totals. After a successful manifest write, it uses Duckov's native mod manager to disable itself, so it will not export again on a later game start. If the item collection is unavailable or manifest generation fails, it remains enabled and logs the reason rather than silently disabling itself.
 
 Exports are never written to this repository. Each set is isolated under:
 

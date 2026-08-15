@@ -81,6 +81,7 @@ namespace DuckovItemIconExporter
                 if ((index + 1) % IconsPerFrame == 0) yield return null;
             }
 
+            var exportCompleted = false;
             try
             {
                 ManifestWriter.WriteAll(directory, results);
@@ -89,6 +90,7 @@ namespace DuckovItemIconExporter
                 var failed = ordered.Count(item => item.Status == ExportStatus.Failed);
                 var successful = ordered.Count - unavailable - failed;
                 Debug.Log(Prefix + " completed. Discovered=" + ordered.Count + ", successful=" + successful + ", unavailable=" + unavailable + ", failed=" + failed + ". Export directory: " + directory);
+                exportCompleted = true;
             }
             catch (Exception exception)
             {
@@ -98,6 +100,13 @@ namespace DuckovItemIconExporter
             {
                 renderSurface?.Dispose();
                 renderSurface = null;
+            }
+
+            if (exportCompleted)
+            {
+                yield return null;
+                Debug.Log(Prefix + " export succeeded; disabling this one-time utility.");
+                master.DeactivateMod(info);
             }
         }
 

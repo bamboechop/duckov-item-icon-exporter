@@ -37,6 +37,7 @@ if (failures.Count == 0)
     Require(items.PropertyHasType("ItemStatsSystem", "Item", "Icon", "UnityEngine.Sprite"), "Item.Icon is not a Sprite property.");
     Require(core.HasType("Duckov.Modding", "ModBehaviour"), "Duckov.Modding.ModBehaviour type is missing.");
     Require(core.MethodExists("Duckov.Modding", "ModBehaviour", "OnAfterSetup", 0, false), "ModBehaviour.OnAfterSetup is missing.");
+    Require(core.MethodExists("Duckov.Modding", "ModManager", "DeactivateMod", 1, false), "ModManager.DeactivateMod(ModInfo) is missing.");
     Require(core.HasType("Duckov.UI", "ItemDisplay"), "Duckov.UI.ItemDisplay type is missing.");
     Require(core.MethodCalls("Duckov.UI", "ItemDisplay", "Setup", "ItemStatsSystem.Item", "get_Icon") && core.MethodCalls("Duckov.UI", "ItemDisplay", "Setup", "UnityEngine.UI.Image", "set_sprite"), "ItemDisplay.Setup no longer assigns Item.Icon to Image.sprite.");
     Require(unity.HasType("UnityEngine", "Sprite"), "UnityEngine.Sprite type is missing.");
