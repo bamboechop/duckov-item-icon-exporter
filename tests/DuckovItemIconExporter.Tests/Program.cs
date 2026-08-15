@@ -72,6 +72,7 @@ static void JsonCsvAgreement()
     Equal(2, document.RootElement.GetArrayLength());
     Equal(3, csv.Split('\n', StringSplitOptions.RemoveEmptyEntries).Length);
     Equal(4, document.RootElement[0].GetProperty("typeId").GetInt32());
+    Equal(JsonValueKind.Array, document.RootElement[0].GetProperty("tags").ValueKind);
 }
 static void StatusAccounting()
 {

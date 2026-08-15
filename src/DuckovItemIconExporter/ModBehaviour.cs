@@ -176,9 +176,35 @@ namespace DuckovItemIconExporter
             try { return meta.DisplayName ?? string.Empty; }
             catch (Exception exception) { return "[unavailable: " + exception.GetType().Name + "]"; }
         }
-        private static IReadOnlyList<string> ReadTags(Tag[]? tags) { return tags == null ? Array.Empty<string>() : tags.Where(tag => tag != null).Select(tag => tag.name ?? string.Empty).OrderBy(tag => tag, StringComparer.Ordinal).ToArray(); }
-        private static string AppendReason(string previous, string next) { return string.IsNullOrEmpty(previous) ? next : previous + " " + next; }
-        private static void TryDeleteEmptyDirectory(string directory) { try { if (Directory.Exists(directory) && !Directory.EnumerateFileSystemEntries(directory).Any()) Directory.Delete(directory); } catch { } }
+        private static IReadOnlyList<string> ReadTags(Tag[]? tags)
+        {
+            return tags == null
+                ? Array.Empty<string>()
+                : tags.Where(tag => tag != null)
+                    .Select(tag => tag.name ?? string.Empty)
+                    .OrderBy(tag => tag, StringComparer.Ordinal)
+                    .ToArray();
+        }
+
+        private static string AppendReason(string previous, string next)
+        {
+            return string.IsNullOrEmpty(previous) ? next : previous + " " + next;
+        }
+
+        private static void TryDeleteEmptyDirectory(string directory)
+        {
+            try
+            {
+                if (Directory.Exists(directory) && !Directory.EnumerateFileSystemEntries(directory).Any())
+                {
+                    Directory.Delete(directory);
+                }
+            }
+            catch
+            {
+                // A failed best-effort cleanup must not hide the collection-unavailable error.
+            }
+        }
     }
 
     internal sealed class SpriteRenderSurface : IDisposable
@@ -242,12 +268,23 @@ namespace DuckovItemIconExporter
             }
         }
 
-        public void Dispose() { if (root != null) UnityEngine.Object.Destroy(root); }
+        public void Dispose()
+        {
+            if (root != null) UnityEngine.Object.Destroy(root);
+        }
     }
 
     internal static class PngValidation
     {
         private static readonly byte[] Signature = { 137, 80, 78, 71, 13, 10, 26, 10 };
-        public static bool HasPngSignature(byte[]? bytes) { return bytes != null && bytes.Length >= Signature.Length && Signature.SequenceEqual(bytes.Take(Signature.Length)); }
+        public static bool HasPngSignature(byte[]? bytes)
+        {
+            if (bytes == null || bytes.Length < Signature.Length) return false;
+            for (var index = 0; index < Signature.Length; index++)
+            {
+                if (bytes[index] != Signature[index]) return false;
+            }
+            return true;
+        }
     }
 }

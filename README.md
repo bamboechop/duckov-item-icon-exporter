@@ -4,6 +4,12 @@ Duckov Item Icon Exporter is a standalone, one-time developer utility mod. When 
 
 The source tree and package intentionally contain no Duckov, Unity, or other game DLLs. Do not redistribute extracted icons: they remain game assets and are for local design reference only.
 
+## Repository status
+
+This is a source repository for a developer utility, not a redistribution of Duckov content. Generated exports, game assemblies, build outputs, and deployment staging are ignored by Git. The repository intentionally has no `LICENSE` file yet; choose one before inviting external contributions or reuse.
+
+The supported game build is the installed version verified by `scripts/build.ps1`. If Duckov changes its public mod or item APIs, the native contract probe deliberately fails rather than producing an unverified package.
+
 ## Native contract verified
 
 The supplied build gate probes the installed assemblies, rather than assuming a public mod API. The currently verified contract is:

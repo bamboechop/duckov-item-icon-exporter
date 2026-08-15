@@ -14,7 +14,14 @@ if (($ids | Select-Object -Unique).Count -ne $ids.Count) { throw 'TypeID is not 
 if (($ids -join ',') -ne (($ids | Sort-Object) -join ',')) { throw 'JSON manifest is not TypeID ordered.' }
 $csvRows = @(Get-Content -LiteralPath (Join-Path $ExportDirectory 'items.csv'))
 if ($csvRows.Count -ne $items.Count + 1) { throw 'CSV row count does not agree with JSON.' }
+$csvIds = @($csvRows | Select-Object -Skip 1 | ForEach-Object {
+    if ($_ -notmatch '^"(-?\d+)",') { throw "CSV row has no valid quoted TypeID: $_" }
+    [int]$Matches[1]
+})
+if (($csvIds -join ',') -ne ($ids -join ',')) { throw 'CSV TypeID order does not agree with JSON.' }
 $successful = @($items | Where-Object { $_.status -in @('Exported', 'NativeFallbackExported') })
+$unavailable = @($items | Where-Object { $_.status -eq 'NoIconAvailable' })
+$failed = @($items | Where-Object { $_.status -eq 'Failed' })
 if (@(Get-ChildItem -LiteralPath $icons -Filter '*.png' -File).Count -ne $successful.Count) { throw 'Actual PNG count does not agree with successful manifest rows.' }
 foreach ($item in $items) {
     if ([IO.Path]::GetFileName([string]$item.outputPng) -ne [string]$item.outputPng) { throw "Unsafe output filename for TypeID $($item.typeId)." }
@@ -29,4 +36,4 @@ foreach ($item in $items) {
     elseif ([string]::IsNullOrWhiteSpace([string]$item.reason)) { throw "Non-exported TypeID $($item.typeId) has no explicit reason." }
 }
 if (-not (Get-Content -LiteralPath (Join-Path $ExportDirectory 'index.html') -Raw).Contains('<tbody>')) { throw 'Gallery HTML is incomplete.' }
-Write-Host "PASS: export verified. Discovered=$($items.Count), successful=$($successful.Count), unavailable=@($items | Where-Object status -eq 'NoIconAvailable').Count, failed=@($items | Where-Object status -eq 'Failed').Count"
+Write-Host "PASS: export verified. Discovered=$($items.Count), successful=$($successful.Count), unavailable=$($unavailable.Count), failed=$($failed.Count)"

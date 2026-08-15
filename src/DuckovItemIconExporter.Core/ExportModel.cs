@@ -129,9 +129,41 @@ namespace DuckovItemIconExporter
         }
     }
 
-    public enum SpriteRotation { None, Rotate90, Rotate180, Rotate270 }
-    public readonly struct PixelRect { public PixelRect(int x, int y, int width, int height) { X = x; Y = y; Width = width; Height = height; } public int X { get; } public int Y { get; } public int Width { get; } public int Height { get; } }
-    public readonly struct PixelPoint { public PixelPoint(int x, int y) { X = x; Y = y; } public int X { get; } public int Y { get; } }
+    public enum SpriteRotation
+    {
+        None,
+        Rotate90,
+        Rotate180,
+        Rotate270
+    }
+
+    public readonly struct PixelRect
+    {
+        public PixelRect(int x, int y, int width, int height)
+        {
+            X = x;
+            Y = y;
+            Width = width;
+            Height = height;
+        }
+
+        public int X { get; }
+        public int Y { get; }
+        public int Width { get; }
+        public int Height { get; }
+    }
+
+    public readonly struct PixelPoint
+    {
+        public PixelPoint(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
+
+        public int X { get; }
+        public int Y { get; }
+    }
 
     public static class ManifestWriter
     {
@@ -160,14 +192,24 @@ namespace DuckovItemIconExporter
             {
                 var item = items[index];
                 builder.Append("  {");
-                AppendJson(builder, "typeId", item.TypeId.ToString(CultureInfo.InvariantCulture), false); AppendJson(builder, "internalName", item.InternalName, true);
-                AppendJson(builder, "displayNameKey", item.DisplayNameKey, true); AppendJson(builder, "displayName", item.DisplayName, true);
-                AppendJson(builder, "quality", item.Quality.ToString(CultureInfo.InvariantCulture), false); AppendJson(builder, "category", item.Category, true);
-                AppendJson(builder, "tags", string.Join("|", item.Tags ?? Array.Empty<string>()), true); AppendJson(builder, "caliber", item.Caliber, true);
-                AppendJson(builder, "spriteName", item.SpriteName, true); AppendJson(builder, "textureName", item.TextureName, true);
-                AppendJson(builder, "width", item.Width.ToString(CultureInfo.InvariantCulture), false); AppendJson(builder, "height", item.Height.ToString(CultureInfo.InvariantCulture), false);
-                AppendJson(builder, "outputPng", item.OutputFileName, true); AppendJson(builder, "status", item.Status.ToString(), true); AppendJson(builder, "reason", item.Reason, true, false);
-                builder.Append('}'); if (index + 1 < items.Count) builder.Append(','); builder.Append('\n');
+                AppendJsonNumber(builder, "typeId", item.TypeId, true);
+                AppendJsonString(builder, "internalName", item.InternalName, true);
+                AppendJsonString(builder, "displayNameKey", item.DisplayNameKey, true);
+                AppendJsonString(builder, "displayName", item.DisplayName, true);
+                AppendJsonNumber(builder, "quality", item.Quality, true);
+                AppendJsonString(builder, "category", item.Category, true);
+                AppendJsonStringArray(builder, "tags", item.Tags, true);
+                AppendJsonString(builder, "caliber", item.Caliber, true);
+                AppendJsonString(builder, "spriteName", item.SpriteName, true);
+                AppendJsonString(builder, "textureName", item.TextureName, true);
+                AppendJsonNumber(builder, "width", item.Width, true);
+                AppendJsonNumber(builder, "height", item.Height, true);
+                AppendJsonString(builder, "outputPng", item.OutputFileName, true);
+                AppendJsonString(builder, "status", item.Status.ToString(), true);
+                AppendJsonString(builder, "reason", item.Reason, false);
+                builder.Append('}');
+                if (index + 1 < items.Count) builder.Append(',');
+                builder.Append('\n');
             }
             return builder.Append("]\n").ToString();
         }
@@ -200,8 +242,36 @@ namespace DuckovItemIconExporter
             return "Duckov Item Icon Exporter summary\nDiscovered: " + items.Count + "\nSuccessful: " + successful + "\nUnavailable: " + Count(counts, ExportStatus.NoIconAvailable) + "\nFailed: " + Count(counts, ExportStatus.Failed) + "\n";
         }
 
-        private static int Count(IReadOnlyDictionary<ExportStatus, int> counts, ExportStatus status) { return counts.TryGetValue(status, out var value) ? value : 0; }
-        private static void AppendJson(StringBuilder builder, string name, string value, bool quoted, bool comma = true) { builder.Append('\"').Append(name).Append("\":"); if (quoted) builder.Append('\"').Append(Json(value)).Append('\"'); else builder.Append(value); if (comma) builder.Append(','); }
+        private static int Count(IReadOnlyDictionary<ExportStatus, int> counts, ExportStatus status)
+        {
+            return counts.TryGetValue(status, out var value) ? value : 0;
+        }
+
+        private static void AppendJsonNumber(StringBuilder builder, string name, int value, bool comma)
+        {
+            builder.Append('\"').Append(name).Append("\":").Append(value.ToString(CultureInfo.InvariantCulture));
+            if (comma) builder.Append(',');
+        }
+
+        private static void AppendJsonString(StringBuilder builder, string name, string? value, bool comma)
+        {
+            builder.Append('\"').Append(name).Append("\":\"").Append(Json(value)).Append('\"');
+            if (comma) builder.Append(',');
+        }
+
+        private static void AppendJsonStringArray(StringBuilder builder, string name, IReadOnlyList<string>? values, bool comma)
+        {
+            builder.Append('\"').Append(name).Append("\":[");
+            var source = values ?? Array.Empty<string>();
+            for (var index = 0; index < source.Count; index++)
+            {
+                if (index > 0) builder.Append(',');
+                builder.Append('\"').Append(Json(source[index])).Append('\"');
+            }
+            builder.Append(']');
+            if (comma) builder.Append(',');
+        }
+
         private static string Csv(string? value) { return "\"" + (value ?? string.Empty).Replace("\"", "\"\"") + "\""; }
         private static string Json(string? value) { return (value ?? string.Empty).Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t"); }
         private static string Html(string? value) { return (value ?? string.Empty).Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;").Replace("'", "&#39;"); }
