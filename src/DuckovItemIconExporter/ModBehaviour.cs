@@ -6,6 +6,7 @@ using System.Linq;
 using Duckov.Modding;
 using Duckov.Utilities;
 using ItemStatsSystem;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -33,7 +34,7 @@ namespace DuckovItemIconExporter
             exportRoutine = null;
             renderSurface?.Dispose();
             renderSurface = null;
-            progressOverlay?.Dispose();
+            if (progressOverlay != null && !progressOverlay.IsCompletionVisible) progressOverlay.Dispose();
             progressOverlay = null;
             Debug.Log(Prefix + " shut down cleanly.");
         }
@@ -115,6 +116,7 @@ namespace DuckovItemIconExporter
 
             if (exportCompleted)
             {
+                progressOverlay!.ShowCompletion(directory);
                 yield return null;
                 Debug.Log(Prefix + " export succeeded; disabling this one-time utility.");
                 master.DeactivateMod(info);
@@ -231,8 +233,17 @@ namespace DuckovItemIconExporter
     internal sealed class ExportProgressOverlay : IDisposable
     {
         private readonly GameObject root;
+        private readonly RectTransform panel;
+        private readonly TextMeshProUGUI heading;
+        private readonly TextMeshProUGUI detail;
+        private readonly GameObject progressTrack;
         private readonly RectTransform fill;
+        private readonly Button copyPathButton;
+        private readonly Button closeButton;
         private readonly int total;
+        private string exportDirectory = string.Empty;
+
+        public bool IsCompletionVisible { get; private set; }
 
         public ExportProgressOverlay(int total)
         {
@@ -251,15 +262,30 @@ namespace DuckovItemIconExporter
             var blocker = CreateImage("Blocker", root.transform, new Color(0f, 0f, 0f, 0.82f), true);
             Stretch(blocker.rectTransform);
 
-            var panel = CreateImage("Panel", root.transform, new Color(0.08f, 0.12f, 0.16f, 0.96f), false);
-            panel.rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
-            panel.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
-            panel.rectTransform.pivot = new Vector2(0.5f, 0.5f);
-            panel.rectTransform.sizeDelta = new Vector2(560f, 104f);
+            var panelImage = CreateImage("Panel", root.transform, new Color(0.08f, 0.12f, 0.16f, 0.96f), false);
+            panel = panelImage.rectTransform;
+            panel.anchorMin = new Vector2(0.5f, 0.5f);
+            panel.anchorMax = new Vector2(0.5f, 0.5f);
+            panel.pivot = new Vector2(0.5f, 0.5f);
+            panel.sizeDelta = new Vector2(760f, 240f);
+
+            heading = CreateText("Heading", panel, 36f, TextAlignmentOptions.Center, Color.white);
+            heading.rectTransform.anchorMin = new Vector2(0f, 0.66f);
+            heading.rectTransform.anchorMax = new Vector2(1f, 0.9f);
+            heading.rectTransform.offsetMin = new Vector2(32f, 0f);
+            heading.rectTransform.offsetMax = new Vector2(-32f, 0f);
+            heading.text = "Exporting item icons";
+
+            detail = CreateText("Detail", panel, 24f, TextAlignmentOptions.Center, new Color(0.84f, 0.9f, 0.95f, 1f));
+            detail.rectTransform.anchorMin = new Vector2(0f, 0.42f);
+            detail.rectTransform.anchorMax = new Vector2(1f, 0.62f);
+            detail.rectTransform.offsetMin = new Vector2(32f, 0f);
+            detail.rectTransform.offsetMax = new Vector2(-32f, 0f);
 
             var track = CreateImage("Track", panel.transform, new Color(1f, 1f, 1f, 0.16f), false);
-            track.rectTransform.anchorMin = new Vector2(0f, 0.36f);
-            track.rectTransform.anchorMax = new Vector2(1f, 0.64f);
+            progressTrack = track.gameObject;
+            track.rectTransform.anchorMin = new Vector2(0f, 0.22f);
+            track.rectTransform.anchorMax = new Vector2(1f, 0.36f);
             track.rectTransform.offsetMin = new Vector2(32f, 0f);
             track.rectTransform.offsetMax = new Vector2(-32f, 0f);
 
@@ -269,11 +295,43 @@ namespace DuckovItemIconExporter
             fill.anchorMax = new Vector2(0f, 1f);
             fill.offsetMin = Vector2.zero;
             fill.offsetMax = Vector2.zero;
+
+            copyPathButton = CreateButton("CopyPath", panel, "Copy export path", CopyExportPath);
+            copyPathButton.gameObject.SetActive(false);
+            closeButton = CreateButton("Close", panel, "Close", Dispose);
+            closeButton.gameObject.SetActive(false);
+            SetProgress(0);
         }
 
         public void SetProgress(int completed)
         {
             fill.anchorMax = new Vector2(Mathf.Clamp01(completed / (float)total), 1f);
+            detail.text = completed + " / " + total + " item icons exported. Please wait…";
+        }
+
+        public void ShowCompletion(string directory)
+        {
+            exportDirectory = directory ?? throw new ArgumentNullException(nameof(directory));
+            IsCompletionVisible = true;
+            progressTrack.SetActive(false);
+            panel.sizeDelta = new Vector2(960f, 400f);
+
+            heading.rectTransform.anchorMin = new Vector2(0f, 0.77f);
+            heading.rectTransform.anchorMax = new Vector2(1f, 0.93f);
+            detail.rectTransform.anchorMin = new Vector2(0f, 0.31f);
+            detail.rectTransform.anchorMax = new Vector2(1f, 0.72f);
+            detail.text = "Export complete.\n\n" + directory + "\n\nThe exporter mod has disabled itself, so it will not export again when Duckov starts.";
+
+            ConfigureButton((RectTransform)copyPathButton.transform, 0.28f, 0.08f, 0.48f, 0.2f);
+            ConfigureButton((RectTransform)closeButton.transform, 0.54f, 0.08f, 0.74f, 0.2f);
+            copyPathButton.gameObject.SetActive(true);
+            closeButton.gameObject.SetActive(true);
+        }
+
+        private void CopyExportPath()
+        {
+            GUIUtility.systemCopyBuffer = exportDirectory;
+            detail.text = "Export path copied to the clipboard.\n\n" + exportDirectory + "\n\nThe exporter mod has disabled itself, so it will not export again when Duckov starts.";
         }
 
         public void Dispose()
@@ -292,6 +350,49 @@ namespace DuckovItemIconExporter
             image.color = color;
             image.raycastTarget = raycastTarget;
             return image;
+        }
+
+        private static TextMeshProUGUI CreateText(string name, Transform parent, float fontSize, TextAlignmentOptions alignment, Color color)
+        {
+            var textObject = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI))
+            {
+                hideFlags = HideFlags.HideAndDontSave
+            };
+            textObject.transform.SetParent(parent, false);
+            var text = textObject.GetComponent<TextMeshProUGUI>();
+            text.font = TMP_Settings.defaultFontAsset ?? TMP_Settings.GetFontAsset();
+            text.fontSize = fontSize;
+            text.alignment = alignment;
+            text.color = color;
+            text.enableWordWrapping = true;
+            text.raycastTarget = false;
+            return text;
+        }
+
+        private static Button CreateButton(string name, Transform parent, string label, UnityEngine.Events.UnityAction action)
+        {
+            var buttonObject = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button))
+            {
+                hideFlags = HideFlags.HideAndDontSave
+            };
+            buttonObject.transform.SetParent(parent, false);
+            var image = buttonObject.GetComponent<Image>();
+            image.color = new Color(0.12f, 0.88f, 0.94f, 1f);
+            var button = buttonObject.GetComponent<Button>();
+            button.targetGraphic = image;
+            button.onClick.AddListener(action);
+            var buttonText = CreateText("Label", buttonObject.transform, 22f, TextAlignmentOptions.Center, new Color(0.02f, 0.08f, 0.12f, 1f));
+            Stretch(buttonText.rectTransform);
+            buttonText.text = label;
+            return button;
+        }
+
+        private static void ConfigureButton(RectTransform rect, float minX, float minY, float maxX, float maxY)
+        {
+            rect.anchorMin = new Vector2(minX, minY);
+            rect.anchorMax = new Vector2(maxX, maxY);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
         }
 
         private static void Stretch(RectTransform rect)

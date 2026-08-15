@@ -9,7 +9,7 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 if ([string]::IsNullOrWhiteSpace($DuckovPath)) { throw 'Supply -DuckovPath or set DUCKOV_PATH to the Escape from Duckov installation.' }
 $DuckovPath = [IO.Path]::GetFullPath($DuckovPath)
 $managed = Join-Path $DuckovPath 'Duckov_Data\Managed'
-foreach ($required in @('ItemStatsSystem.dll', 'TeamSoda.Duckov.Core.dll', 'TeamSoda.Duckov.Utilities.dll', 'UnityEngine.CoreModule.dll', 'UnityEngine.ImageConversionModule.dll', 'UnityEngine.UI.dll', 'UnityEngine.UIModule.dll')) {
+foreach ($required in @('ItemStatsSystem.dll', 'TeamSoda.Duckov.Core.dll', 'TeamSoda.Duckov.Utilities.dll', 'UnityEngine.CoreModule.dll', 'UnityEngine.ImageConversionModule.dll', 'UnityEngine.IMGUIModule.dll', 'UnityEngine.UI.dll', 'UnityEngine.UIModule.dll', 'Unity.TextMeshPro.dll')) {
     if (-not (Test-Path -LiteralPath (Join-Path $managed $required) -PathType Leaf)) { throw "Missing required game assembly: $required" }
 }
 
